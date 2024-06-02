@@ -1,13 +1,8 @@
+import os.path
+
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont
 import pywt
-
-
-def load_image(image_path):
-    """
-    Загрузка изображения.
-    """
-    return Image.open(image_path)
 
 
 def compute_detail_level(block):
@@ -20,7 +15,7 @@ def compute_detail_level(block):
     return np.sum(np.abs(HH))
 
 
-def embed_watermark_text(image, watermark_text, block_size):
+def embed_watermark_text(image_name, image, watermark_text, block_size, out_folder='image_fragments_watermark'):
     """
     Внедрение текстового водяного знака в блок.
     """
@@ -48,19 +43,6 @@ def embed_watermark_text(image, watermark_text, block_size):
     # Внедрение водяного знака
     draw.text((max_detail_block[0], max_detail_block[1]), watermark_text, fill=(255, 255, 255), font=font)
 
+    image.save(os.path.join(out_folder, image_name))
+
     return image
-if __name__ == "__main__":
-    # Путь к изображению и текстовому водяному знаку
-    image_path = "dataset/cyberpunk.jpg"
-    watermark_text = "Watermark"
-
-    original_image = load_image(image_path)
-
-    # Размер блока
-    block_size = 100  # Измените размер блока по вашему выбору
-
-    # Внедрение водяного знака
-    watermarked_image = embed_watermark_text(original_image, watermark_text, block_size)
-
-    # Сохранение стеганографированного блока (для демонстрации)
-    watermarked_image.save("dataset/watermarked_image.jpg")

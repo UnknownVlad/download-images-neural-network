@@ -1,26 +1,19 @@
 import os
-from PIL import Image
 
-# Параметры
-input_image_path = "downloaded_images/a09k1putma.jpg"  # Укажите путь к вашему большому изображению
-output_folder = "image_fragments"
-fragment_width = 256
-fragment_height = 256
-
-# Создание папки, если она не существует
-os.makedirs(output_folder, exist_ok=True)
+from new_wow import embed_watermark_text
+from utils import count_images_in_folder, gen_rnd_text
 
 
-def split_image(image_path, output_folder, fragment_width, fragment_height):
+def split_image(img, fragment_width=256, fragment_height=256, saving_folder='image_fragments'):
+    os.makedirs(saving_folder, exist_ok=True)
     try:
-        img = Image.open(image_path)
         img_width, img_height = img.size
 
         # Рассчитываем количество фрагментов по горизонтали и вертикали
         num_fragments_x = img_width // fragment_width
         num_fragments_y = img_height // fragment_height
 
-        fragment_number = 0
+        fragment_number = count_images_in_folder(saving_folder) + 1
 
         for i in range(num_fragments_y):
             for j in range(num_fragments_x):
@@ -34,10 +27,11 @@ def split_image(image_path, output_folder, fragment_width, fragment_height):
 
                 # Генерируем имя файла для фрагмента
                 fragment_filename = f"fragment_{fragment_number}.jpg"
-                fragment_path = os.path.join(output_folder, fragment_filename)
+                fragment_path = os.path.join(saving_folder, fragment_filename)
 
                 # Сохраняем фрагмент
                 fragment.save(fragment_path)
+                embed_watermark_text(fragment_filename, fragment, gen_rnd_text(),100)
                 print(f"Fragment saved: {fragment_path}")
 
                 fragment_number += 1
@@ -46,4 +40,3 @@ def split_image(image_path, output_folder, fragment_width, fragment_height):
         print(f"Failed to split image: {e}")
 
 
-split_image(input_image_path, output_folder, fragment_width, fragment_height)

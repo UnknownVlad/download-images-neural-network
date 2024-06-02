@@ -5,15 +5,8 @@ from io import BytesIO
 import random
 import string
 
-# Параметры
-output_folder = "downloaded_images_2"
-min_width = 800
-min_height = 600
-num_images = 5
-unsplash_access_key = "ZYB2T9V5KhXCFT4v-xr1gqXZebz4rn7RYvL0ZSFiSYw"
-
-# Создание папки, если она не существует
-os.makedirs(output_folder, exist_ok=True)
+from config import unsplash_access_key, min_width, min_height, output_folder
+from shape import split_image
 
 
 def get_random_image_url():
@@ -24,6 +17,7 @@ def get_random_image_url():
 
 
 def download_image(url, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
     try:
         response = requests.get(url)
         img = Image.open(BytesIO(response.content))
@@ -33,13 +27,16 @@ def download_image(url, output_folder):
             filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) + ".jpg"
             filepath = os.path.join(output_folder, filename)
             img.save(filepath)
+
+            split_image(img, split_image)
+
             print(f"Image saved: {filepath}")
         else:
             print(f"Image skipped: {url} (size {img.width}x{img.height})")
     except Exception as e:
         print(f"Failed to download image from {url}: {e}")
 
-
-for _ in range(num_images):
-    image_url = get_random_image_url()
-    download_image(image_url, output_folder)
+def get_started(num_images = 5):
+    for _ in range(num_images):
+        image_url = get_random_image_url()
+        download_image(image_url, output_folder)
